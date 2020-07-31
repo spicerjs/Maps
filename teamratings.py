@@ -9,16 +9,53 @@ This is a temporary script file.
 import streamlit as st
 import pandas as pd
 import base64
-import matplotlib.pyplot as plt
 import numpy as np
+import plotly as pl
+import plotly.graph_objs as gobj
+import pandas as pd
+from plotly.offline import download_plotlyjs,init_notebook_mode,plot,iplot
+init_notebook_mode(connected=True)
+
 
 st.title('Team Ratings')
 
 ###read in csv file to be called leagueoutcomes
 df = pd.read_csv('Teams.csv', sep=',')
 
+df['League'].fillna(0, inplace=True)
+df['League'] = np.where(df['League']==0, df.Country.astype(str) + ' ' + df.Tier.astype(str), df['League'])
 
-st.sidebar.header('User Input Features')
+st.sidebar.header('Teams and leagues to include')
+  
+
+dfmap = df[['Country', 'Position']]
+dfmap.Details = np.where(dfmap.Position == 1, 1, 2)
+dfmap.Details = np.where(dfmap.Position == '', 3, dfmap.Details)
+dfmap.Country = np.where(dfmap.Country == 'Columbia', 'Colombia', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'England', 'uk', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'Nth America', 'USA', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'S Africa', 'South Africa', dfmap.Country)
+
+
+data = dict(type = 'choropleth',
+            locations = dfmap.Country,
+            locationmode = 'country names',
+            colorscale= 'Portland',
+            z=dfmap.Details,
+            showscale = False,
+            )
+#initializing the layout variable
+layout = dict(geo = {'scope':'world'}, 
+              width=1000, height= 150,
+              margin=dict( l=0, r=0, b=0, t=0, pad=12, autoexpand=True ))
+
+# Initializing the Figure object by passing data and layout as arguments.
+col_map = gobj.Figure(data = [data],layout = layout)
+
+#plotting the map
+iplot(col_map) 
+st.sidebar.plotly_chart(col_map, use_container_width=True)
+
 
 all_tiers_option = ['Yes', 'No']
 tiers_option = st.sidebar.selectbox('Only include top division from each country?', all_tiers_option)
@@ -46,7 +83,7 @@ if team_search == 'Yes':
     ranking = max(0,ranking)
     ranking = min(ranking, len(df)-11)
     df = df.sort_values(by='Rating', ascending=False)
-    st.write(selected_team + ' is ' + str(ranking))
+    df.Rating = df.Rating.map('{:.3f}'.format)
     st.dataframe(df[['Country', 'League', 'Team', 'Rating']].iloc[ranking:ranking+11])
     
 
@@ -61,13 +98,12 @@ else:
         df = df[df.League.isin(selected_leagues)]
  
 #    st.header('Team Ratings')
+    df.Rating = df.Rating.map('{:.3f}'.format)
     st.dataframe(df[['Country', 'League', 'Team', 'Rating']])
+
   
 st.markdown("""
-The coverage of leagues is global but not completely comprehensive.
-In Europe and South America, top two leagues (and sometimes additional tiers) in all UEFA/Comnebol countries except Andorra, Bolivia, Faroe Islands, Gibraltar, Kosova, Luxembourg and San Marino where only top league included.  
-Elsewhere, top two tiers for Costa Rica and Mexico, China, Hong Kong, Indonesia, Iran, Japan, Malaysia, Qatar, Saudi Arabia, South Korea, UAE, and Vietnam, and Algeria, Morocco, South Africa, and Tunisia.
-""")
 
+""")
 
 
