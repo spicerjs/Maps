@@ -73,7 +73,7 @@ if single_country:
     df = df[df.Country == selected_country]
 #   st.write('Just teams from')
     df.Rating = df.Rating.map('{:.3f}'.format)
-    st.dataframe(df[['Country', 'League', 'Team', 'Rating']])
+    st.dataframe(df[['Team', 'Rating', 'Country', 'League']])
 
 else:    
     team_search = st.sidebar.checkbox('Search for a team?', value=False) 
@@ -90,12 +90,12 @@ else:
         ranking = min(ranking, len(df)-11)
         df = df.sort_values(by='Rating', ascending=False)
         df.Rating = df.Rating.map('{:.3f}'.format)
-        st.dataframe(df[['Country', 'League', 'Team', 'Rating']].iloc[ranking:ranking+11])
+        st.dataframe(df[['Team', 'Rating', 'Country', 'League']].iloc[ranking:ranking+11])
     
     
     else:
         df.Rating = df.Rating.map('{:.3f}'.format)
-        st.dataframe(df[['Country', 'League', 'Team', 'Rating']])
+        st.dataframe(df[['Team', 'Rating', 'Country', 'League']])
 
  
 
