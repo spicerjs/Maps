@@ -100,7 +100,7 @@ else:
  
 
 st.write()
-st.write(f"[Expected league finishes](https://python-football.herokuapp.com#).")
+st.write(f"[Expected league finishes](https://world-league-predict.herokuapp.com#).")
 st.write()
 st.write(f"[Big games this coming week](https://sixpointers.herokuapp.com#).")
 st.write()         
