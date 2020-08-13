@@ -16,11 +16,48 @@ import plotly.graph_objs as gobj
 from plotly.offline import download_plotlyjs,init_notebook_mode,plot,iplot
 init_notebook_mode(connected=True)
 
+
+import requests
+from io import StringIO
+
+# define parameters for a request
+token = '06f4689d01a62991c554d4b5b623a81194ef32e0' 
+owner = 'spicerjs'
+repo = 'Six-pointers'
+path = 'Teams.csv'
+
+# send a request
+r = requests.get(
+    'https://api.github.com/repos/{owner}/{repo}/contents/{path}'.format(
+    owner=owner, repo=repo, path=path),
+    headers={
+        'accept': 'application/vnd.github.v3.raw',
+        'authorization': 'token {}'.format(token)
+            }
+    )
+# convert string to StringIO object
+string_io_obj = StringIO(r.text)
+# Load data to df
+df = pd.read_csv(string_io_obj, sep=",")
+
+#Reading in the Map file
+path = 'Map.csv'
+r = requests.get(
+    'https://api.github.com/repos/{owner}/{repo}/contents/{path}'.format(
+    owner=owner, repo=repo, path=path),
+    headers={
+        'accept': 'application/vnd.github.v3.raw',
+        'authorization': 'token {}'.format(token)
+            }
+    )
+string_io_obj = StringIO(r.text)
+dfmap = pd.read_csv(string_io_obj, sep=",")
+
+
+
 st.title('Team Ratings')
 
 ###read in csv file to be called leagueoutcomes
-df = pd.read_csv('Teams.csv', sep=',')
-
 df['League'].fillna(0, inplace=True)
 df.Tier = df.Tier.astype(int)
 df['League'] = np.where(df['League']==0, df.Country.astype(str) + ' ' + df.Tier.astype(str), df['League'])
