@@ -53,8 +53,6 @@ r = requests.get(
 string_io_obj = StringIO(r.text)
 dfmap = pd.read_csv(string_io_obj, sep=",")
 
-
-
 st.title('Team Ratings')
 
 ###read in csv file to be called leagueoutcomes
@@ -64,19 +62,25 @@ df['League'] = np.where(df['League']==0, df.Country.astype(str) + ' ' + df.Tier.
 
 st.sidebar.header('Teams and leagues to include')
   
+dfmap = df[['Country', 'Tier', 'Position', 'Rating']]
+dfmap1 = dfmap.groupby(['Country'])['Rating'].max()
+dfmap = pd.merge(dfmap, dfmap1)    
+#dfmap = dfmap.dropna()
 
-dfmap = df[['Country', 'Position']]
-dfmap.Details = np.where(dfmap.Position == 1, 1, 2)
-dfmap.Details = np.where(dfmap.Position == '', 3, dfmap.Details)
+
+#dfmap = dfmap[dfmap.Position == 1]
 dfmap.Country = np.where(dfmap.Country == 'England', 'uk', dfmap.Country)
 dfmap.Country = np.where(dfmap.Country == 'S Africa', 'South Africa', dfmap.Country)
 
+st.write(dfmap.head())
+dfmap.Rating = round(dfmap.Rating, 2)
 
 data = dict(type = 'choropleth',
             locations = dfmap.Country,
             locationmode = 'country names',
-            colorscale= 'Portland',
-            z=dfmap.Details,
+            colorscale= 'greens',
+#            reversescale = True,
+            z=dfmap.Rating,
             showscale = False,
             )
 #initializing the layout variable
@@ -142,3 +146,4 @@ st.write()
 st.write(f"[Big games this coming week](https://sixpointers.herokuapp.com#).")
 st.write()         
 st.write(f"[https://elosports.wordpress.com/about/](https://elosports.wordpress.com/about/#).")
+
