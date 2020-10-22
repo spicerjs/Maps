@@ -72,7 +72,6 @@ dfmap = pd.merge(dfmap, dfmap1)
 dfmap.Country = np.where(dfmap.Country == 'England', 'uk', dfmap.Country)
 dfmap.Country = np.where(dfmap.Country == 'S Africa', 'South Africa', dfmap.Country)
 
-st.write(dfmap.head())
 dfmap.Rating = round(dfmap.Rating, 2)
 
 data = dict(type = 'choropleth',
