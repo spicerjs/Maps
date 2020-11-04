@@ -16,7 +16,6 @@ import plotly.graph_objs as gobj
 from plotly.offline import download_plotlyjs,init_notebook_mode,plot,iplot
 init_notebook_mode(connected=True)
 
-
 import requests
 from io import StringIO
 
@@ -63,12 +62,13 @@ df['League'] = np.where(df['League']==0, df.Country.astype(str) + ' ' + df.Tier.
 st.sidebar.header('Teams and leagues to include')
   
 dfmap = df[['Country', 'Tier', 'Position', 'Rating']]
-dfmap1 = dfmap.groupby(['Country'])['Rating'].max()
-dfmap = pd.merge(dfmap, dfmap1)    
-#dfmap = dfmap.dropna()
 
+def top(ratings, column, n):
+    return ratings.sort_values(by=column, ascending=False)[:n]    #function for identifying country's best n teams
+dfmap = dfmap.groupby('Country').apply(top, column='Rating', n=8)[['Rating']]
+dfmap = dfmap.groupby('Country').mean()
+dfmap['Country'] = dfmap.index
 
-#dfmap = dfmap[dfmap.Position == 1]
 dfmap.Country = np.where(dfmap.Country == 'England', 'uk', dfmap.Country)
 dfmap.Country = np.where(dfmap.Country == 'S Africa', 'South Africa', dfmap.Country)
 
@@ -145,4 +145,3 @@ st.write()
 st.write(f"[Big games this coming week](https://sixpointers.herokuapp.com#).")
 st.write()         
 st.write(f"[https://elosports.wordpress.com/about/](https://elosports.wordpress.com/about/#).")
-
