@@ -8,3 +8,4 @@ geopandas==0.6.3
 cartopy==0.17.0
 json==2.0.9
 fiona==1.8.6
+proj==4.9.0
