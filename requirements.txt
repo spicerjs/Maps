@@ -5,5 +5,3 @@ scikit-learn==0.21.2
 plotly==4.12.0
 matplotlib==3.2.1
 geopandas==0.6.3
-json==2.0.9
-fiona==1.8.6
