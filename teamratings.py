@@ -108,9 +108,9 @@ r = requests.get(
             }
     )
 # convert string to StringIO object
-string_io_obj = StringIO(r.text)
-# Load data to df
-leaguesmap = gpd.read_file(string_io_obj, sep=",")
+#string_io_obj = StringIO(r.text)
+#leaguesmap = gpd.read_file(string_io_obj, sep=",")
+leaguesmap = gpd.read_file(r)
 
 
 
