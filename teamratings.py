@@ -90,57 +90,74 @@ dfmap.Country = np.where(dfmap.Country == 'Uzbek', 'Uzbekistan', dfmap.Country)
 
 
 
-import cartopy
-import cartopy.io.shapereader as shpreader
+#####import cartopy
+#####import cartopy.io.shapereader as shpreader
 import geopandas as gpd
 import json
 import fiona
 
-   
-shpfilename = cartopy.io.shapereader.natural_earth( \
-  resolution='50m', \
-  category='cultural', \
-  name='admin_0_map_units')
+path = 'leaguesmap.shp'
 
-leaguesmap = gpd.read_file(shpfilename)
+# send a request
+r = requests.get(
+    'https://api.github.com/repos/{owner}/{repo}/contents/{path}'.format(
+    owner=owner, repo=repo, path=path),
+    headers={
+        'accept': 'application/vnd.github.v3.raw',
+        'authorization': 'token {}'.format(token)
+            }
+    )
+# convert string to StringIO object
+string_io_obj = StringIO(r.text)
+# Load data to df
+leaguesmap = gpd.read_csv(string_io_obj, sep=",")
+
+
+
+#####shpfilename = cartopy.io.shapereader.natural_earth( \
+  #####resolution='50m', \
+  #####category='cultural', \
+  #####name='admin_0_map_units')
+
+#####leaguesmap = gpd.read_file(shpfilename)
 
 #Countries we don't want divided into separate parts
-leaguesmap = leaguesmap[['SOVEREIGNT', 'SUBUNIT', 'geometry']]
-leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Belgium']
-leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Bosnia and Herzegovina']
-leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Portugal']
-leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Republic of Serbia']
+#####leaguesmap = leaguesmap[['SOVEREIGNT', 'SUBUNIT', 'geometry']]
+#####leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Belgium']
+#####leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Bosnia and Herzegovina']
+#####leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Portugal']
+#####leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Republic of Serbia']
 
 #Map of Sovereign nations
-shpfilename1 = cartopy.io.shapereader.natural_earth( \
-  resolution='50m', \
-  category='cultural', \
-  name='admin_0_countries')
+#####shpfilename1 = cartopy.io.shapereader.natural_earth( \
+  #####resolution='50m', \
+  #####category='cultural', \
+  #####name='admin_0_countries')
 
-countries = gpd.read_file(shpfilename1)
-countries = countries[['SOVEREIGNT', 'SUBUNIT', 'geometry']]
+#####countries = gpd.read_file(shpfilename1)
+#####countries = countries[['SOVEREIGNT', 'SUBUNIT', 'geometry']]
 #whole country outlines we want to add back in
-countries = countries[
-              (countries['SOVEREIGNT'] == "Belgium")
-              | (countries['SOVEREIGNT'] == "Bosnia and Herzegovina")
-              | (countries['SOVEREIGNT'] == "Portugal")
-              | (countries['SOVEREIGNT'] == "Republic of Serbia")
-              ] 
-leaguesmap = pd.concat([leaguesmap, countries])
+#####countries = countries[
+     #####         (countries['SOVEREIGNT'] == "Belgium")
+          #####    | (countries['SOVEREIGNT'] == "Bosnia and Herzegovina")
+     #####         | (countries['SOVEREIGNT'] == "Portugal")
+     #####         | (countries['SOVEREIGNT'] == "Republic of Serbia")
+     #####         ] 
+#####leaguesmap = pd.concat([leaguesmap, countries])
 
 
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Hong Kong S.A.R.', 'Hong Kong', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Macao S.A.R', 'Macao', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Czechia', 'Czech Rep', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Bosnia and Herzegovina', 'Bosnia', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Republic of Serbia', 'Serbia', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Cabo Verde', 'Cape Verde', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'West Bank', 'Palestine', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'RÃ©union', 'Reunion', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'SÃ£o TomÃ© and Principe', 'Sao Tome and Principe', leaguesmap.SUBUNIT )
-leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'CuraÃ§ao', 'Curacao', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Hong Kong S.A.R.', 'Hong Kong', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Macao S.A.R', 'Macao', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Czechia', 'Czech Rep', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Bosnia and Herzegovina', 'Bosnia', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Republic of Serbia', 'Serbia', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Cabo Verde', 'Cape Verde', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'West Bank', 'Palestine', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'RÃ©union', 'Reunion', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'SÃ£o TomÃ© and Principe', 'Sao Tome and Principe', leaguesmap.SUBUNIT )
+#####leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'CuraÃ§ao', 'Curacao', leaguesmap.SUBUNIT )
 
-leaguesmap = leaguesmap[['SUBUNIT', 'geometry']]
+#####leaguesmap = leaguesmap[['SUBUNIT', 'geometry']]
 leaguesmap_json = json.loads(leaguesmap.to_json())
 
 dfmap.Rating = round(dfmap.Rating, 2)
