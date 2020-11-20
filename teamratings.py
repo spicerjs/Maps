@@ -11,10 +11,13 @@ import streamlit as st
 import pandas as pd
 import base64
 import numpy as np
+import random
 import plotly as pl
 import plotly.graph_objs as gobj
+import pandas as pd
 from plotly.offline import download_plotlyjs,init_notebook_mode,plot,iplot
 init_notebook_mode(connected=True)
+
 
 import requests
 from io import StringIO
@@ -62,6 +65,8 @@ df['League'] = np.where(df['League']==0, df.Country.astype(str) + ' ' + df.Tier.
 st.sidebar.header('Teams and leagues to include')
   
 dfmap = df[['Country', 'Tier', 'Position', 'Rating']]
+dfmap.Country = np.where(dfmap.Country == 'S Korea', 'South Korea', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'N Korea', 'North Korea', dfmap.Country)
 
 def top(ratings, column, n):
     return ratings.sort_values(by=column, ascending=False)[:n]    #function for identifying country's best n teams
@@ -69,30 +74,93 @@ dfmap = dfmap.groupby('Country').apply(top, column='Rating', n=8)[['Rating']]
 dfmap = dfmap.groupby('Country').mean()
 dfmap['Country'] = dfmap.index
 
-dfmap.Country = np.where(dfmap.Country == 'England', 'uk', dfmap.Country)
+#dfmap.Country = np.where(dfmap.Country == 'England', 'uk', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'Dominican Rep', 'Dominican Republic', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'DRCongo', 'Democratic Republic of the Congo', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'Eswatini', 'eSwatini', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'Luxemburg', 'Luxembourg', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'N Ireland', 'Northern Ireland', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'N Macedonia', 'Macedonia', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'Surinam', 'Suriname', dfmap.Country)
 dfmap.Country = np.where(dfmap.Country == 'S Africa', 'South Africa', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'Switz', 'Switzerland', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'UAE', 'United Arab Emirates', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'USA', 'United States', dfmap.Country)
+dfmap.Country = np.where(dfmap.Country == 'Uzbek', 'Uzbekistan', dfmap.Country)
+
+
+
+import cartopy
+import cartopy.io.shapereader as shpreader
+import geopandas as gpd
+import json
+import fiona
+
+   
+shpfilename = cartopy.io.shapereader.natural_earth( \
+  resolution='50m', \
+  category='cultural', \
+  name='admin_0_map_units')
+
+leaguesmap = gpd.read_file(shpfilename)
+
+#Countries we don't want divided into separate parts
+leaguesmap = leaguesmap[['SOVEREIGNT', 'SUBUNIT', 'geometry']]
+leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Belgium']
+leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Bosnia and Herzegovina']
+leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Portugal']
+leaguesmap = leaguesmap[leaguesmap.SOVEREIGNT != 'Republic of Serbia']
+
+#Map of Sovereign nations
+shpfilename1 = cartopy.io.shapereader.natural_earth( \
+  resolution='50m', \
+  category='cultural', \
+  name='admin_0_countries')
+
+countries = gpd.read_file(shpfilename1)
+countries = countries[['SOVEREIGNT', 'SUBUNIT', 'geometry']]
+#whole country outlines we want to add back in
+countries = countries[
+              (countries['SOVEREIGNT'] == "Belgium")
+              | (countries['SOVEREIGNT'] == "Bosnia and Herzegovina")
+              | (countries['SOVEREIGNT'] == "Portugal")
+              | (countries['SOVEREIGNT'] == "Republic of Serbia")
+              ] 
+leaguesmap = pd.concat([leaguesmap, countries])
+
+
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Hong Kong S.A.R.', 'Hong Kong', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Macao S.A.R', 'Macao', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Czechia', 'Czech Rep', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Bosnia and Herzegovina', 'Bosnia', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Republic of Serbia', 'Serbia', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'Cabo Verde', 'Cape Verde', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'West Bank', 'Palestine', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'RÃ©union', 'Reunion', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'SÃ£o TomÃ© and Principe', 'Sao Tome and Principe', leaguesmap.SUBUNIT )
+leaguesmap.SUBUNIT = np.where(leaguesmap.SUBUNIT == 'CuraÃ§ao', 'Curacao', leaguesmap.SUBUNIT )
+
+leaguesmap = leaguesmap[['SUBUNIT', 'geometry']]
+leaguesmap_json = json.loads(leaguesmap.to_json())
 
 dfmap.Rating = round(dfmap.Rating, 2)
 
-data = dict(type = 'choropleth',
-            locations = dfmap.Country,
-            locationmode = 'country names',
-            colorscale= 'greens',
-#            reversescale = True,
-            z=dfmap.Rating,
-            showscale = False,
-            )
-#initializing the layout variable
-layout = dict(geo = {'scope':'world'}, 
-              width=1000, height= 150,
-              margin=dict( l=0, r=0, b=0, t=0, pad=12, autoexpand=True ))
+import plotly.express as px
+# Choropleth representing the length of region names
+fig = px.choropleth(data_frame=dfmap, 
+                    geojson=leaguesmap_json, 
+                    locations='Country', # name of dataframe column
+                    featureidkey='properties.SUBUNIT',  # path to field in GeoJSON feature object with which to match the values passed in to locations
+            #        featureidkey='properties.SUBUNIT',  # path to field in GeoJSON feature object with which to match the values passed in to locations
+                    color='Rating',
+                    color_continuous_scale="greens",
+                   )
 
-# Initializing the Figure object by passing data and layout as arguments.
-col_map = gobj.Figure(data = [data],layout = layout)
+fig.update_geos(showcountries=True, showcoastlines=True, showland=True)#, fitbounds="locations")
+fig.update(layout_coloraxis_showscale=False)
+fig.update_layout(width=300, height= 150, margin={"r":0,"t":0,"l":0,"b":0})
+st.sidebar.plotly_chart(fig)
 
-#plotting the map
-iplot(col_map) 
-st.sidebar.plotly_chart(col_map, use_container_width=True)
 
 
 DEFAULT_CTRY = df[df.Rating == df.Rating.max()]['Country'].values[0]
@@ -138,6 +206,8 @@ else:
         st.dataframe(df[['Team', 'Rating', 'Country', 'League']])
 
  
+    
+    
 
 st.write()
 st.write(f"[Expected league finishes](https://world-league-predict.herokuapp.com#).")
