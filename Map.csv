@@ -1,5 +1,0 @@
-Visitor,Time,Home,homerate,awayrate,Importance,colorh,hatchh,edgecolorh,color,hatch,edgecolor,longitude,latitude,HomeSideOdds,hometeam,importance,AwaySideOdds,awayteam,Timestamp,League,Country,LeagueDummy,TeamWiki,sixptimp
-Atletico Paranaense,2020-08-17 01:45:00,Santos,225.0,213.0,213.29436810949784,white, ,black,red,/,black,-23.5704,-46.202,0.0,0,0.0,0.0,0,0.0,0,0,0,0,0.1
-Santos,2020-08-14 01:30:00,Internacional,210.0,225.0,210.1394072289215,red, ,white,white, ,black,-30.0356,-51.1409,0.0,0,0.0,0.0,0,0.0,0,0,0,0,0.1
-Krasnodar,2020-08-15 19:00:00,Lokomotiv Moscow,179.0,159.0,158.62016023457298,red, ,red,#007224, ,black,55.4613,37.4428,0.14700000000000008,Lokomotiv Moscow,0.10352356256890284,0.0959999999999997,Krasnodar,1597518000.0, Premier League,Russia,Russia 1.0,Krasnodar,9.27272844120975
-Cerezo Osaka,2020-08-19 13:00:00,Kawasaki Frontale,175.0,131.0,130.8394197428407,skyblue, ,black,#f22285, ,white,35.3509,139.391,0.8799999999999973,Front Kawasaki,0.1904710569613205,0.05499999999999995,Cerezo Osaka,1597842000.0, J-League,Japan,Japan 1.0,Cerezo Osaka,12.93093432204661
